@@ -29,6 +29,9 @@ add_library(objlib OBJECT ${SOURCES_LIST})
 set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
 
 add_library(ffi_static STATIC $<TARGET_OBJECTS:objlib>)
+target_include_directories(ffi_static PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include)
+target_include_directories(ffi_static PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(ffi_static PUBLIC include)
 
 if(MSVC)
     add_definitions(-DFFI_BUILDING_DLL)
@@ -36,21 +39,11 @@ if(MSVC)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
     set(CMAKE_MACOSX_RPATH 1)
 endif()
+
 add_library(ffi_shared SHARED $<TARGET_OBJECTS:objlib> ${OBJECTS_LIST})
+target_include_directories(ffi_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include)
+target_include_directories(ffi_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(ffi_shared PUBLIC include)
 
-set_target_properties(ffi_static PROPERTIES OUTPUT_NAME ffi)
-set_target_properties(ffi_shared PROPERTIES OUTPUT_NAME ffi)
-
-install(TARGETS ffi_static ffi_shared
-    EXPORT ${PROJECT_NAME}Targets
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib)
-
-install(EXPORT ${PROJECT_NAME}Targets
-    DESTINATION share/${PROJECT_NAME})
-
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/include/ffi.h
-    ${CMAKE_CURRENT_BINARY_DIR}/include/ffitarget.h
-    DESTINATION include)
+set_target_properties(ffi_static PROPERTIES OUTPUT_NAME libffi)
+set_target_properties(ffi_shared PROPERTIES OUTPUT_NAME libffi)
