@@ -8,7 +8,7 @@ include(CheckTypeSize)
 
 # options in AC counterpart can be overriden from command-line
 # e.g.:  cmake .. -DFFI_MMAP_EXEC_EMUTRAMP_PAX=1 -DVERSION=X.Y
-if(NOT DEFINED VERSION)
+if(NOT DEFINED ${VERSION})
     set(VERSION 3.x-dev)
 endif()
 set(PACKAGE libffi)
@@ -131,10 +131,19 @@ else()
     set(HAVE_LONG_DOUBLE 1)
 endif()
 
-check_function_exists(alloca  C_ALLOCA)
-check_function_exists (mmap HAVE_MMAP)
+check_function_exists(alloca C_ALLOCA)
+if(NOT DEFINED ${C_ALLOCA})
+    set(C_ALLOCA 0 CACHE INTERNAL "")
+endif()
+check_function_exists(mmap HAVE_MMAP)
+if(NOT DEFINED ${HAVE_MMAP})
+    set(HAVE_MMAP 0 CACHE INTERNAL "")
+endif()
 
-check_symbol_exists (MAP_ANON sys/mman.h HAVE_MMAP_ANON)
+check_symbol_exists(MAP_ANON sys/mman.h HAVE_MMAP_ANON)
+if(NOT DEFINED ${HAVE_MMAP_ANON})
+    set(HAVE_MMAP_ANON 0 CACHE INTERNAL "")
+endif()
 
 check_c_source_runs(
     "
@@ -147,36 +156,97 @@ check_c_source_runs(
         int devzero = open(\"/dev/zero\", O_RDWR);
         return devzero == -1 || mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_SHARED, devzero, 0) == (void *)-1 ? 1 : 0;
     }" HAVE_MMAP_DEV_ZERO)
+if(NOT DEFINED ${HAVE_MMAP_DEV_ZERO})
+  set(HAVE_MMAP_DEV_ZERO 0 CACHE INTERNAL "")
+endif()
 
 check_include_file(alloca.h HAVE_ALLOCA_H)
+if(NOT DEFINED ${HAVE_ALLOCA_H})
+  set(HAVE_ALLOCA_H 0 CACHE INTERNAL "")
+endif()
 
 check_c_source_compiles(
-    "
-    #include <alloca.h>
-    int main()
-    {
-        char* x = alloca(1024);
-        return 0;
+  "
+  #include <alloca.h>
+  int main()
+  {
+    char* x = alloca(1024);
+    return 0;
     }
     "
     HAVE_ALLOCA)
+if(NOT DEFINED ${HAVE_ALLOCA})
+  set(HAVE_ALLOCA 0 CACHE INTERNAL "")
+endif()
 
 check_include_file(dlfcn.h HAVE_DLFCN_H)
+if(NOT DEFINED ${HAVE_DLFCN_H})
+  set(HAVE_DLFCN_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(inttypes.h HAVE_INTTYPES_H)
+if(NOT DEFINED ${HAVE_INTTYPES_H})
+  set(HAVE_INTTYPES_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(memory.h HAVE_MEMORY_H)
+if(NOT DEFINED ${HAVE_MEMORY_H})
+  set(HAVE_MEMORY_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(stdint.h HAVE_STDINT_H)
+if(NOT DEFINED ${HAVE_STDINT_H})
+  set(HAVE_STDINT_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(stdlib.h HAVE_STDLIB_H)
+if(NOT DEFINED ${HAVE_STDLIB_H})
+  set(HAVE_STDLIB_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(strings.h HAVE_STRINGS_H)
+if(NOT DEFINED ${HAVE_STRINGS_H})
+  set(HAVE_STRINGS_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(string.h HAVE_STRING_H)
+if(NOT DEFINED ${HAVE_STRING_H})
+  set(HAVE_STRING_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(sys/mman.h HAVE_SYS_MMAN_H)
+if(NOT DEFINED ${HAVE_SYS_MMAN_H})
+  set(HAVE_SYS_MMAN_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(sys/stat.h HAVE_SYS_STAT_H)
+if(NOT DEFINED ${HAVE_SYS_STAT_H})
+  set(HAVE_SYS_STAT_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+if(NOT DEFINED ${HAVE_SYS_TYPES_H})
+  set(HAVE_SYS_TYPES_H 0 CACHE INTERNAL "")
+endif()
 check_include_file(unistd.h HAVE_UNISTD_H)
+if(NOT DEFINED ${HAVE_UNISTD_H})
+  set(HAVE_UNISTD_H 0 CACHE INTERNAL "")
+endif()
 check_include_files("stdlib.h;stdarg.h;string.h;float.h" STDC_HEADERS)
+if(NOT DEFINED ${STDC_HEADERS})
+  set(STDC_HEADERS 0 CACHE INTERNAL "")
+endif()
 
-check_symbol_exists(memcpy string.h HAVE_MEMCPY)
-set(CMAKE_REQUIRED_DEFINITIONS "-D_GNU_SOURCE")
+check_c_source_compiles(
+  "
+  #include <string.h>
+  int main()
+  {
+    (void)&memcpy;
+    return 0;
+    }
+    "
+    HAVE_MEMCPY)
+if(NOT DEFINED ${HAVE_MEMCPY})
+  set(HAVE_MEMCPY 0 CACHE INTERNAL "")
+endif()
 check_symbol_exists(mkostemp stdlib.h HAVE_MKOSTEMP)
+if(NOT DEFINED ${HAVE_MKOSTEMP})
+  set(HAVE_MKOSTEMP 0 CACHE INTERNAL "")
+endif()
+
+set(CMAKE_REQUIRED_DEFINITIONS "-D_GNU_SOURCE")
 set(CMAKE_REQUIRED_DEFINITIONS)
 
 if (NOT MSVC)
@@ -307,6 +377,7 @@ check_c_source_compiles(
     }
     "
     HAVE_AS_CFI_PSEUDO_OP)
+set(HAVE_AS_CFI_PSEUDO_OP 0 CACHE BOOL "")
 
 configure_file(include/ffi.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/ffi.h)
 configure_file(include/fficonfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/fficonfig.h)

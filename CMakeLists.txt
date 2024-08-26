@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 2.8.8)
-project(libffi C)
+cmake_minimum_required(VERSION 3.5)
+project(libffi VERSION 3.4.6 LANGUAGES C ASM)
 
 set(SOURCES_LIST
     src/closures.c
-    src/java_raw_api
+    src/java_raw_api.c
     src/prep_cif.c
     src/raw_api.c
     src/types.c)
