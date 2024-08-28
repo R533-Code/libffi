@@ -5,6 +5,9 @@ include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CheckTypeSize)
+include(TestBigEndian)
+
+test_big_endian(__FFI_IS_BIG_ENDIAN)
 
 # options in AC counterpart can be overriden from command-line
 # e.g.:  cmake .. -DFFI_MMAP_EXEC_EMUTRAMP_PAX=1 -DVERSION=X.Y

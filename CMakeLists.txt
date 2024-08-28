@@ -2,15 +2,15 @@ cmake_minimum_required(VERSION 3.5)
 project(libffi VERSION 3.4.6 LANGUAGES C ASM)
 
 set(SOURCES_LIST
-    src/closures.c
-    src/java_raw_api.c
+    #src/closures.c
+    #src/java_raw_api.c
     src/prep_cif.c
     src/raw_api.c
-    src/types.c)
-
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    list(APPEND SOURCES_LIST src/debug.c)
-    add_definitions(-DFFI_DEBUG)
+    src/types.c
+    $<$<CONFIG:Debug>:src/debug.c>
+)
+if(BUILD_TYPE STREQUAL "Debug" OR BUILD_TYPE STREQUAL "RelWithDebInfo")
+    add_compile_definitions(FFI_DEBUG)
 endif()
 
 include(configure_platform.cmake)
