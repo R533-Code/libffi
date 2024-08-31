@@ -41,3 +41,4 @@ elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
 endif()
 
 set_target_properties(ffi PROPERTIES OUTPUT_NAME libffi)
+add_library(ffi::ffi ALIAS ffi)
