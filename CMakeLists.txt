@@ -23,8 +23,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)
 
-add_definitions(-DFFI_BUILDING)
 add_library(ffi ${SOURCES_LIST})
+target_compile_definitions(ffi PRIVATE FFI_BUILDING)
 set_property(TARGET ffi PROPERTY POSITION_INDEPENDENT_CODE 1)
 
 target_include_directories(ffi PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include)
@@ -33,7 +33,7 @@ target_include_directories(ffi PUBLIC include)
 
 if(MSVC)
     if (${BUILD_SHARED_LIBS})
-      add_definitions(-DFFI_BUILDING_DLL)
+      target_compile_definitions(ffi PRIVATE FFI_BUILDING_DLL)
     endif()
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
