@@ -7,7 +7,7 @@ set(SOURCES_LIST
     src/prep_cif.c
     src/raw_api.c
     src/types.c
-    $<$<CONFIG:Debug>:src/debug.c>
+    $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:src/debug.c>
 )
 if(BUILD_TYPE STREQUAL "Debug" OR BUILD_TYPE STREQUAL "RelWithDebInfo")
     add_compile_definitions(FFI_DEBUG)
@@ -24,26 +24,20 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(include)
 
 add_definitions(-DFFI_BUILDING)
+add_library(ffi ${SOURCES_LIST})
+set_property(TARGET ffi PROPERTY POSITION_INDEPENDENT_CODE 1)
 
-add_library(objlib OBJECT ${SOURCES_LIST})
-set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
-
-add_library(ffi_static STATIC $<TARGET_OBJECTS:objlib>)
-target_include_directories(ffi_static PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_include_directories(ffi_static PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(ffi_static PUBLIC include)
+target_include_directories(ffi PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include)
+target_include_directories(ffi PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(ffi PUBLIC include)
 
 if(MSVC)
-    add_definitions(-DFFI_BUILDING_DLL)
+    if (${BUILD_SHARED_LIBS})
+      add_definitions(-DFFI_BUILDING_DLL)
+    endif()
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
     set(CMAKE_MACOSX_RPATH 1)
 endif()
 
-add_library(ffi_shared SHARED $<TARGET_OBJECTS:objlib> ${OBJECTS_LIST})
-target_include_directories(ffi_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_include_directories(ffi_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(ffi_shared PUBLIC include)
-
-set_target_properties(ffi_static PROPERTIES OUTPUT_NAME libffi)
-set_target_properties(ffi_shared PROPERTIES OUTPUT_NAME libffi)
+set_target_properties(ffi PROPERTIES OUTPUT_NAME libffi)
