@@ -71,8 +71,9 @@ char *alloca ();
 #endif
 
 /* Check for the existence of memcpy. */
-#if STDC_HEADERS
 # include <string.h>
+#if STDC_HEADERS
+//# include <string.h> <- changed by R533
 #else
 # ifndef HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
