@@ -557,11 +557,12 @@ EHFrame0:
 .section .eh_frame,"a",@progbits
 #endif
 
-#ifdef HAVE_AS_X86_PCREL
+// vvvv changed by R533
+//#ifdef HAVE_AS_X86_PCREL
 # define PCREL(X)	X - .
-#else
-# define PCREL(X)	X@rel
-#endif
+//#else
+//# define PCREL(X)	X@rel
+//#endif
 
 /* Simplify advancing between labels.  Assume DW_CFA_advance_loc1 fits.  */
 #ifdef __CET__
